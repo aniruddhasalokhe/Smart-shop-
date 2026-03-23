@@ -141,7 +141,7 @@ export default function LoginPage() {
               <div className="flex justify-center gap-4 text-xs font-mono-display text-muted-foreground">
                 <span className="hover:text-primary transition-colors cursor-crosshair">boss : password123</span>
                 <span>//</span>
-                <span className="hover:text-primary transition-colors cursor-crosshair">operator1 : password123</span>
+                <span className="hover:text-primary transition-colors cursor-crosshair">m.chen : password123</span>
               </div>
             </div>
 
