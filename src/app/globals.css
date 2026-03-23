@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+
+@layer base {
+  :root {
+    --background: 220 20% 10%;
+    --foreground: 210 20% 90%;
+
+    --card: 220 18% 13%;
+    --card-foreground: 210 20% 90%;
+
+    --popover: 220 18% 13%;
+    --popover-foreground: 210 20% 90%;
+
+    --primary: 199 89% 48%;
+    --primary-foreground: 220 20% 5%;
+
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 210 20% 85%;
+
+    --muted: 220 14% 16%;
+    --muted-foreground: 215 15% 55%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 220 20% 5%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 20%;
+    --input: 220 15% 20%;
+    --ring: 199 89% 48%;
+
+    --radius: 0.5rem;
+
+    --status-running: 142 71% 45%;
+    --status-idle: 45 93% 47%;
+    --status-down: 0 72% 51%;
+    --status-maintenance: 199 89% 48%;
+
+    --sidebar-background: 220 20% 8%;
+    --sidebar-foreground: 210 20% 80%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 220 20% 5%;
+    --sidebar-accent: 220 15% 15%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 199 89% 48%;
+
+    --chart-1: 199 89% 48%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 45 93% 47%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 0 72% 51%;
+
+    --font-display: 'JetBrains Mono', monospace;
+    --font-body: 'Inter', sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .font-mono-display {
+    font-family: var(--font-display);
+  }
+
+  .status-running {
+    color: hsl(var(--status-running));
+  }
+  .status-idle {
+    color: hsl(var(--status-idle));
+  }
+  .status-down {
+    color: hsl(var(--status-down));
+  }
+
+  .bg-status-running {
+    background-color: hsl(var(--status-running));
+  }
+  .bg-status-idle {
+    background-color: hsl(var(--status-idle));
+  }
+  .bg-status-down {
+    background-color: hsl(var(--status-down));
+  }
+
+  .status-dot {
+    @apply w-3 h-3 rounded-full animate-pulse;
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  .glow-running {
+    box-shadow: 0 0 12px hsl(var(--status-running) / 0.4);
+  }
+  .glow-idle {
+    box-shadow: 0 0 12px hsl(var(--status-idle) / 0.4);
+  }
+  .glow-down {
+    box-shadow: 0 0 12px hsl(var(--status-down) / 0.4);
+  }
+
+  .card-industrial {
+    @apply bg-card border border-border rounded-lg p-4 transition-all duration-200;
+  }
+  .card-industrial:hover {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.1);
+  }
+}
