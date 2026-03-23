@@ -3,11 +3,11 @@
 import { useState, useRef } from 'react';
 import { 
   Monitor, Zap, Package, Clock, TrendingUp, Users, Activity, 
-  BarChart2, AlertTriangle, LogOut, CheckCircle, Plus, Upload, Download
+  BarChart2, AlertTriangle, LogOut, CheckCircle, Plus, Upload, Download, Settings
 } from "lucide-react";
 import { KpiCard } from "@/components/KpiCard";
 import { StatusBadge } from "@/components/StatusBadge";
-import { logout, createEmployee, importMachines } from "@/actions";
+import { logout, createEmployee, importMachines, resetEmployeePassword } from "@/actions";
 import { motion } from "framer-motion";
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, 
@@ -18,6 +18,7 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
   const [showEmpModal, setShowEmpModal] = useState(false);
   const [showNodeModal, setShowNodeModal] = useState(false);
   const [showAttModal, setShowAttModal] = useState(false);
+  const [showUsersModal, setShowUsersModal] = useState(false);
   const [empForm, setEmpForm] = useState({ username: '', name: '', passwordRaw: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -70,6 +71,19 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
       alert('Error creating employee. Username might exist.');
     }
     setIsSubmitting(false);
+  };
+
+  const handleResetPassword = async (userId: string, name: string) => {
+    const newPass = window.prompt(`Override passkey for operator: ${name}\n\nEnter new temporary passkey:`);
+    if (!newPass) return;
+    if (newPass.length < 4) return alert('Passkey must be at least 4 characters long.');
+    
+    try {
+      await resetEmployeePassword(userId, newPass);
+      alert(`Passkey for ${name} has been successfully updated!`);
+    } catch (err) {
+      alert('Failed to reset passkey. Ensure you have owner permissions.');
+    }
   };
 
   const totalOk = jobs.reduce((acc, j) => acc + j.okParts, 0);
@@ -139,7 +153,10 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
             </div>
             <div className="flex flex-wrap gap-3">
               <button onClick={() => setShowAttModal(true)} className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 outline-none">
-                <Users size={14} /> Attendance
+                <Clock size={14} /> Log
+              </button>
+              <button onClick={() => setShowUsersModal(true)} className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 outline-none">
+                <Settings size={14} /> Directory
               </button>
               <button onClick={() => setShowEmpModal(true)} className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 outline-none">
                 <Plus size={14} /> Add User
@@ -423,6 +440,62 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
           </div>
         </div>
       )}
+
+      {/* Team Directory Modal */}
+      {showUsersModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="w-full max-w-2xl card-industrial border-primary/20 max-h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold font-mono-display uppercase tracking-widest text-foreground flex items-center gap-2">
+                <Settings size={18} /> Operator Directory
+              </h3>
+              <button onClick={() => setShowUsersModal(false)} className="text-muted-foreground hover:text-foreground">
+                <Plus size={20} className="rotate-45" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto mb-6 pr-2">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-muted-foreground sticky top-0 bg-card">
+                    <th className="pb-3 font-medium px-4">Full Name</th>
+                    <th className="pb-3 font-medium">Terminal Alias</th>
+                    <th className="pb-3 font-medium">Role</th>
+                    <th className="pb-3 font-medium text-right px-4">Security Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {users.filter(u => u.role !== 'OWNER').map(usr => (
+                    <tr key={usr.id} className="hover:bg-secondary/20 transition-colors">
+                      <td className="py-3 font-medium px-4 text-primary">{usr.name}</td>
+                      <td className="py-3 text-muted-foreground font-mono-display">{usr.username}</td>
+                      <td className="py-3 text-muted-foreground">{usr.role}</td>
+                      <td className="py-3 text-right px-4">
+                        <button 
+                          onClick={() => handleResetPassword(usr.id, usr.name)}
+                          className="px-3 py-1.5 bg-destructive/20 text-destructive border border-destructive/30 text-[10px] font-bold uppercase rounded hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                        >
+                          Override Passkey
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {users.filter(u => u.role !== 'OWNER').length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-8 text-center text-muted-foreground">No personnel registered yet.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="pt-4 border-t border-border">
+              <button type="button" onClick={() => setShowUsersModal(false)} className="w-full px-4 py-2 rounded bg-background border border-border text-xs font-bold uppercase tracking-wider hover:bg-secondary/50">Close Directory</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

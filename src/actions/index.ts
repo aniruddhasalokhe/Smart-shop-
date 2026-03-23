@@ -132,3 +132,27 @@ export async function importMachines(csvData: string) {
   }
 }
 
+export async function resetEmployeePassword(targetUserId: string, newPasswordRaw: string) {
+  const session = await getSession();
+  if (!session || session.role !== 'OWNER') throw new Error('Unauthorized');
+
+  const bcrypt = await import('bcryptjs');
+  const hashedPassword = await bcrypt.hash(newPasswordRaw, 10);
+
+  await db.update(schema.users)
+    .set({ password: hashedPassword })
+    .where(eq(schema.users.id, targetUserId));
+}
+
+export async function changeMyPassword(newPasswordRaw: string) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+
+  const bcrypt = await import('bcryptjs');
+  const hashedPassword = await bcrypt.hash(newPasswordRaw, 10);
+
+  await db.update(schema.users)
+    .set({ password: hashedPassword })
+    .where(eq(schema.users.id, session.id));
+}
+

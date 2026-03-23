@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Play, Square, AlertTriangle, Settings, LogOut, CheckCircle, Upload, Activity, Monitor } from 'lucide-react';
-import { getMachines, updateMachineStatus, resolveDowntime, logJob, logout, getCurrentUser } from '@/actions';
+import { getMachines, updateMachineStatus, resolveDowntime, logJob, logout, getCurrentUser, changeMyPassword } from '@/actions';
 import { StatusBadge } from '@/components/StatusBadge';
 import { motion } from 'framer-motion';
 
@@ -50,6 +50,19 @@ export default function EmployeePortal() {
   const isOperatorAssigned = selectedMachine?.status !== 'OFF' && selectedMachineId;
   const availableMachines = machines.filter(m => m.status === 'OFF' || m.currentOperatorId === userSession?.id);
 
+  const handlePasswordChange = async () => {
+    const newPass = window.prompt("ACCOUNT SECURITY\nEnter your new passkey (minimum 4 characters):");
+    if (!newPass) return;
+    if (newPass.length < 4) return alert("Passkey must be at least 4 characters long.");
+    
+    try {
+      await changeMyPassword(newPass);
+      alert("Your passkey has been successfully updated!");
+    } catch (err) {
+      alert("Failed to update passkey. Please ensure your session is active.");
+    }
+  };
+
   const container = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
   const item = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
@@ -68,12 +81,17 @@ export default function EmployeePortal() {
               <p className="text-xs font-semibold text-primary uppercase tracking-widest">Operator Terminal</p>
             </div>
           </div>
-          <div className="flex items-center gap-6 text-sm">
-            <div className="font-medium text-muted-foreground mr-4">
+          <div className="flex items-center gap-3 md:gap-6 text-sm">
+            <div className="font-medium text-muted-foreground mr-1 md:mr-4 hidden sm:block">
               Session Active: <span className="font-bold text-foreground ml-1">{userSession?.name}</span>
             </div>
+            
+            <button onClick={handlePasswordChange} className="flex items-center gap-2 px-4 py-2 rounded-md bg-secondary/50 text-secondary-foreground hover:bg-secondary transition-colors text-xs font-bold uppercase tracking-wider">
+              <Settings size={14} /> Change Passkey
+            </button>
+
             <form action={logout}>
-              <button type="submit" className="flex items-center gap-2 px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-xs font-bold uppercase tracking-wider">
+              <button type="submit" className="flex items-center gap-2 px-4 py-2 rounded-md bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive hover:text-destructive-foreground transition-colors text-xs font-bold uppercase tracking-wider">
                 <LogOut size={14} /> System Exit
               </button>
             </form>
