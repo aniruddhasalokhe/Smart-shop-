@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { KpiCard } from "@/components/KpiCard";
 import { StatusBadge } from "@/components/StatusBadge";
-import { logout, createEmployee, importMachines, resetEmployeePassword } from "@/actions";
+import { logout, createEmployee, importMachines, resetEmployeePassword, changeMyPassword } from "@/actions";
 import { motion } from "framer-motion";
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, 
@@ -86,6 +86,18 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
     }
   };
 
+  const handlePasswordChange = async () => {
+    const newPass = window.prompt("ACCOUNT SECURITY\nEnter your new passkey (minimum 4 characters):");
+    if (!newPass) return;
+    if (newPass.length < 4) return alert("Passkey must be at least 4 characters long.");
+    try {
+      await changeMyPassword(newPass);
+      alert("Your passkey has been successfully updated!");
+    } catch (err) {
+      alert("Failed to update passkey. Please ensure your session is active.");
+    }
+  };
+
   const totalOk = jobs.reduce((acc, j) => acc + j.okParts, 0);
   const totalRej = jobs.reduce((acc, j) => acc + j.castingRejection + j.machineRejection + j.blowHole, 0);
   const totalRework = jobs.reduce((a, j)=> a + j.rework, 0);
@@ -135,8 +147,13 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
           <span className="text-muted-foreground hidden md:inline-block">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </span>
+          
+          <button onClick={handlePasswordChange} className="flex items-center gap-2 px-4 py-2 rounded-md bg-secondary/50 text-secondary-foreground hover:bg-secondary transition-colors text-xs font-bold uppercase tracking-wider">
+            <Settings size={14} /> Change Passkey
+          </button>
+
           <form action={logout}>
-            <button type="submit" className="flex items-center gap-2 px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-xs font-bold uppercase tracking-wider">
+            <button type="submit" className="flex items-center gap-2 px-4 py-2 rounded-md bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive hover:text-destructive-foreground transition-colors text-xs font-bold uppercase tracking-wider">
               <LogOut size={14} /> System Exit
             </button>
           </form>

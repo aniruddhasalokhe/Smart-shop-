@@ -13,13 +13,24 @@ async function seed() {
   
   const defaultPassword = await bcrypt.hash('password123', 10);
 
-  // Users
-  console.log('Inserting users...');
+  // Production-level Operators 
+  console.log('Inserting production operators...');
   await db.insert(schema.users).values([
-    { id: 'u1', username: 'operator1', password: defaultPassword, name: 'John Operator', role: 'OPERATOR' },
-    { id: 'a1', username: 'supervisor', password: defaultPassword, name: 'Alice Admin', role: 'ADMIN' },
-    { id: 'o1', username: 'boss', password: defaultPassword, name: 'Boss Owner', role: 'OWNER' }
+    { id: 'u1', username: 'm.chen', password: defaultPassword, name: 'Michael Chen (CNC)', role: 'OPERATOR' },
+    { id: 'u2', username: 's.rodriguez', password: defaultPassword, name: 'Sarah Rodriguez (Milling)', role: 'OPERATOR' },
+    { id: 'u3', username: 'd.kim', password: defaultPassword, name: 'David Kim (Assembly)', role: 'OPERATOR' },
+    { id: 'u4', username: 'e.williams', password: defaultPassword, name: 'Emma Williams (QA)', role: 'OPERATOR' }
   ]).onConflictDoNothing();
+
+  // Management (Using onConflictDoUpdate as a fallback boss recovery CLI tool)
+  console.log('Inserting/Recovering Management accounts...');
+  await db.insert(schema.users).values([
+    { id: 'a1', username: 'admin', password: defaultPassword, name: 'System Administrator', role: 'ADMIN' },
+    { id: 'o1', username: 'boss', password: defaultPassword, name: 'Plant Manager', role: 'OWNER' }
+  ]).onConflictDoUpdate({
+    target: schema.users.id,
+    set: { password: defaultPassword }
+  });
 
   // Machines
   console.log('Inserting machines...');
