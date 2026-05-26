@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Shield, User, Lock, Activity, ChevronRight, CheckCircle, Package, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import TurbotechLogo from '@/components/TurbotechLogo';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -49,13 +50,8 @@ export default function LoginPage() {
         
         {/* Left Informational Panel */}
         <div className="flex-1 flex flex-col justify-center gap-6 p-8 lg:p-12 animate-in fade-in slide-in-from-left-8 duration-700">
-          <div className="flex items-center gap-4 mb-4">
-             <div className="p-3 rounded-xl bg-primary/20 text-primary glow-primary relative">
-                <Activity size={32} />
-             </div>
-             <h1 className="text-4xl font-bold font-mono-display tracking-tight text-foreground">
-               Smart Shop-Floor
-             </h1>
+          <div className="mb-2">
+             <TurbotechLogo size="xl" />
           </div>
           <p className="text-muted-foreground text-lg leading-relaxed max-w-md">
             Advanced operational telemetry, live fleet synchronization, and real-time operator diagnostics.

@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Link from 'next/link';
 import { 
   Monitor, Zap, Package, Clock, TrendingUp, Users, Activity, 
-  BarChart2, AlertTriangle, LogOut, CheckCircle, Plus, Upload, Download, Settings
+  BarChart2, AlertTriangle, LogOut, CheckCircle, Plus, Upload, Download, Settings, Calendar
 } from "lucide-react";
 import { KpiCard } from "@/components/KpiCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { logout, createEmployee, importMachines, resetEmployeePassword, changeMyPassword } from "@/actions";
 import { motion } from "framer-motion";
+import TurbotechLogo from '@/components/TurbotechLogo';
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, 
   BarChart, Bar, Cell, PieChart, Pie
@@ -135,13 +137,9 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card shadow-sm z-10 sticky top-0">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/20 text-primary">
-            <Activity size={20} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold font-mono-display tracking-tight text-card-foreground">Smart Shop-Floor</h1>
-            <p className="text-xs font-semibold text-primary uppercase tracking-widest">Command Center</p>
-          </div>
+          <TurbotechLogo variant="full" size="md" />
+          <div className="h-6 w-[1px] bg-border mx-2 hidden sm:block"></div>
+          <p className="text-xs font-semibold text-primary uppercase tracking-widest hidden sm:block pt-1.5" style={{ color: 'hsl(var(--primary))' }}>Command Center</p>
         </div>
         <div className="flex items-center gap-6 text-sm">
           <span className="text-muted-foreground hidden md:inline-block">
@@ -169,6 +167,9 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
                <p className="text-sm text-muted-foreground">Live Telemetry & Fleet Operations Overview</p>
             </div>
             <div className="flex flex-wrap gap-3">
+              <Link href="/dashboard/calendar" className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 transition-colors outline-none">
+                <Calendar size={14} /> Calendar View
+              </Link>
               <button onClick={() => setShowAttModal(true)} className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 outline-none">
                 <Clock size={14} /> Log
               </button>
@@ -291,7 +292,6 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
                     <th className="pb-3 font-medium px-4">Node Designation</th>
                     <th className="pb-3 font-medium">Assigned Sub-Routine</th>
                     <th className="pb-3 font-medium">Operator ID</th>
-                    <th className="pb-3 font-medium">Tool Stress</th>
                     <th className="pb-3 font-medium">Cycle Counter</th>
                     <th className="pb-3 font-medium text-right px-4">Status Flag</th>
                   </tr>
@@ -312,17 +312,6 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
                         <td className="py-4">{/* mock job */}{m.status === 'ON' ? 'Active Schematic' : '—'}</td>
                         <td className="py-4 font-medium text-primary">
                           {op ? <div className="flex items-center gap-2"><Users size={12}/>{op.name}</div> : <span className="text-muted-foreground">UNASSIGNED</span>}
-                        </td>
-                        <td className="py-4">
-                          <div className="flex items-center gap-2 w-32">
-                            <span className={`text-xs ${m.toolLifePercent < 20 ? 'text-destructive font-bold' : 'text-muted-foreground'}`}>{m.toolLifePercent}%</span>
-                            <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full ${m.toolLifePercent < 20 ? 'bg-destructive' : 'bg-primary'}`} 
-                                style={{ width: `${m.toolLifePercent}%` }}
-                              />
-                            </div>
-                          </div>
                         </td>
                         <td className="py-4 font-mono-display text-muted-foreground">{m.totalCycles}</td>
                         <td className="py-4 text-right px-4">

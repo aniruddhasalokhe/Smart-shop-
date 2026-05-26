@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
-import type { MachineStatus, OperatorStatus, JobStatus } from "@/data/mockData";
+export type MachineStatus = 'running' | 'idle' | 'breakdown' | 'maintenance';
+export type OperatorStatus = 'active' | 'break' | 'absent';
+export type JobStatus = 'in-progress' | 'completed' | 'pending' | 'stopped';
 
 const machineStatusConfig: Record<MachineStatus, { label: string; className: string; dotClass: string }> = {
   running: { label: 'Running', className: 'bg-status-running/15 text-status-running border-status-running/30', dotClass: 'bg-status-running' },

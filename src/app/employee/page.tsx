@@ -5,6 +5,7 @@ import { Play, Square, AlertTriangle, Settings, LogOut, CheckCircle, Upload, Act
 import { getMachines, updateMachineStatus, resolveDowntime, logJob, logout, getCurrentUser, changeMyPassword } from '@/actions';
 import { StatusBadge } from '@/components/StatusBadge';
 import { motion } from 'framer-motion';
+import TurbotechLogo from '@/components/TurbotechLogo';
 
 export default function EmployeePortal() {
   const [machines, setMachines] = useState<any[]>([]);
@@ -73,13 +74,9 @@ export default function EmployeePortal() {
         {/* Header */}
         <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card shadow-sm shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/20 text-primary">
-              <Settings size={20} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold font-mono-display tracking-tight text-card-foreground">Smart Shop-Floor</h1>
-              <p className="text-xs font-semibold text-primary uppercase tracking-widest">Operator Terminal</p>
-            </div>
+            <TurbotechLogo variant="full" size="md" />
+            <div className="h-6 w-[1px] bg-border mx-2 hidden sm:block"></div>
+            <p className="text-xs font-semibold text-primary uppercase tracking-widest hidden sm:block pt-1.5" style={{ color: 'hsl(var(--primary))' }}>Operator Terminal</p>
           </div>
           <div className="flex items-center gap-3 md:gap-6 text-sm">
             <div className="font-medium text-muted-foreground mr-1 md:mr-4 hidden sm:block">
@@ -197,7 +194,7 @@ export default function EmployeePortal() {
                       <input placeholder="Ex: Acme Corp Industries" required value={plan.companyName} onChange={e => setPlan({...plan, companyName: e.target.value})} className="w-full p-2.5 rounded-md bg-background border border-border text-sm focus:outline-none focus:border-primary placeholder:text-muted-foreground/50" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Spec Signature</label>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Component Name</label>
                       <input placeholder="Ex: Gear Shaft B1" required value={plan.componentName} onChange={e => setPlan({...plan, componentName: e.target.value})} className="w-full p-2.5 rounded-md bg-background border border-border text-sm focus:outline-none focus:border-primary placeholder:text-muted-foreground/50" />
                     </div>
                     <div className="space-y-1.5">
@@ -238,10 +235,10 @@ export default function EmployeePortal() {
 
                   {/* Scrollable Form Body */}
                   <div className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
                         
                         {/* Giant OK Yield Field */}
-                        <div className="col-span-2 lg:col-span-4 rounded-xl flex flex-col items-center p-8 bg-emerald-500/5 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+                        <div className="col-span-1 sm:col-span-3 rounded-xl flex flex-col items-center p-8 bg-emerald-500/5 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
                           <label className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 text-emerald-500">
                             <CheckCircle size={18} /> Verified Net Yield (OK)
                           </label>
@@ -265,11 +262,6 @@ export default function EmployeePortal() {
                         <div className="rounded-xl flex flex-col items-center p-4 bg-rose-500/5 border border-rose-500/20 transition-all hover:border-rose-500/40">
                           <label className="text-[10px] uppercase font-bold tracking-widest mb-2 text-rose-500 text-center">Machining Err</label>
                           <input type="number" min="0" value={jobData.machineRejection || ''} onChange={e=>setJobData({...jobData, machineRejection: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-rose-500 font-mono-display font-bold text-4xl w-full placeholder:text-rose-500/30" placeholder="0" />
-                        </div>
-                        
-                        <div className="rounded-xl flex flex-col items-center p-4 bg-rose-500/5 border border-rose-500/20 transition-all hover:border-rose-500/40">
-                          <label className="text-[10px] uppercase font-bold tracking-widest mb-2 text-rose-500 text-center">Blow Hole</label>
-                          <input type="number" min="0" value={jobData.blowHole || ''} onChange={e=>setJobData({...jobData, blowHole: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-rose-500 font-mono-display font-bold text-4xl w-full placeholder:text-rose-500/30" placeholder="0" />
                         </div>
                         
                         <div className="rounded-xl flex flex-col items-center p-4 bg-amber-500/5 border border-amber-500/20 transition-all hover:border-amber-500/40">
