@@ -9,86 +9,110 @@ interface TurbotechLogoProps {
 }
 
 export default function TurbotechLogo({ variant = 'full', size = 'md', className = '' }: TurbotechLogoProps) {
-  // Size mappings
-  const sizeClasses = {
-    sm: { svg: 'h-8 w-auto', text: 'text-xs' },
-    md: { svg: 'h-10 w-auto', text: 'text-sm' },
-    lg: { svg: 'h-14 w-auto', text: 'text-lg' },
-    xl: { svg: 'h-24 w-auto', text: 'text-2xl' }
+  const sizeMap = {
+    sm: { svg: 'h-8',  brand: '1rem',   sub: '0.45rem' },
+    md: { svg: 'h-10', brand: '1.25rem', sub: '0.58rem' },
+    lg: { svg: 'h-14', brand: '1.65rem', sub: '0.75rem' },
+    xl: { svg: 'h-24', brand: '2.5rem',  sub: '1.1rem'  },
   };
+  const s = sizeMap[size];
 
-  const activeSize = sizeClasses[size];
-
-  // Gear Teeth angles (10-cog gear)
-  const teethAngles = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
+  // 10 gear teeth at every 36°
+  const teeth = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Dynamic SVG Vector Logo */}
-      <svg 
-        viewBox="0 0 100 100" 
-        className={`${activeSize.svg} shrink-0 select-none`}
-        fill="none" 
+    <div className={`flex items-center gap-2.5 ${className}`}>
+
+      {/* ── SVG LOGO MARK ─────────────────────────────── */}
+      <svg
+        viewBox="0 0 100 100"
+        className={`${s.svg} w-auto shrink-0 select-none`}
+        fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          {/* Left half clipping mask */}
-          <clipPath id="clip-left">
+          {/* Left half = dark foreground colour */}
+          <clipPath id="ttl">
             <rect x="0" y="0" width="50" height="100" />
           </clipPath>
-          {/* Right half clipping mask */}
-          <clipPath id="clip-right">
+          {/* Right half = brand cyan / primary colour */}
+          <clipPath id="ttr">
             <rect x="50" y="0" width="50" height="100" />
           </clipPath>
         </defs>
 
-        {/* Unified Gear Construction Group */}
-        {/* We define the shapes here inside a reusable <g> to render twice with different clips/colors */}
-        <g id="gear-shape">
-          {/* Main Gear Ring */}
-          <circle cx="50" cy="50" r="30" stroke="currentColor" strokeWidth="9" fill="none" className="stroke-[9]" />
-          
-          {/* Center Hole ring outline */}
-          <circle cx="50" cy="50" r="14" stroke="currentColor" strokeWidth="2.5" fill="none" className="opacity-10" />
+        {/*
+          Everything is drawn once inside <g id="tt">,
+          then rendered twice with different clip + colour.
+        */}
+        <g id="tt">
+          {/* Gear ring */}
+          <circle cx="50" cy="50" r="30" stroke="currentColor" strokeWidth="9" />
 
-          {/* 10 crisp trapezoidal teeth rotated around center */}
-          {teethAngles.map((angle) => (
-            <path
+          {/* 10 rectangular teeth around the gear */}
+          {teeth.map((angle) => (
+            <rect
               key={angle}
-              d="M 46.5 8 L 53.5 8 L 55.5 20 L 44.5 20 Z"
+              x="45.5" y="9"
+              width="9" height="13"
+              rx="1.5"
               fill="currentColor"
-              transform={`rotate(${angle}, 50, 50)`}
+              transform={`rotate(${angle} 50 50)`}
             />
           ))}
 
-          {/* Stylized "T" shape merging from center hole to top/right */}
-          {/* M 44 26 (stem left) H 76 (top bar right) V 36 (top bar bottom) H 56 (stem right) V 76 (stem bottom) H 44 Z */}
-          <path 
-            d="M 43.5 23 H 76 V 34 H 56.5 V 77 H 43.5 Z" 
-            fill="currentColor" 
+          {/*
+            Double-T icon inside gear:
+            Two overlapping bold italic "T" shapes —
+            left T slightly offset, right T skewed italic style.
+          */}
+
+          {/* Back T (full-width crossbar) */}
+          <path
+            d="M 29 27 H 71 V 37 H 55 V 73 H 45 V 37 H 29 Z"
+            fill="currentColor"
+          />
+
+          {/* Front T inset — creates the overlapping double-T look */}
+          <path
+            d="M 34 27 H 66 V 35 H 52.5 V 73 H 47.5 V 35 H 34 Z"
+            fill="currentColor"
+            opacity="0.55"
           />
         </g>
 
-        {/* Render Left Half (Clipped to Left, colored text-foreground / white / black) */}
-        <use href="#gear-shape" clipPath="url(#clip-left)" className="text-foreground" fill="currentColor" />
+        {/* Dark left half */}
+        <use href="#tt" clipPath="url(#ttl)" className="text-foreground" fill="currentColor" />
 
-        {/* Render Right Half (Clipped to Right, colored in Turbotech Cyan/Blue `#0284c7` matching the app primary color) */}
-        <use href="#gear-shape" clipPath="url(#clip-right)" className="text-primary" fill="currentColor" style={{ color: 'hsl(var(--primary))' }} />
+        {/* Cyan right half */}
+        <use
+          href="#tt"
+          clipPath="url(#ttr)"
+          fill="currentColor"
+          style={{ color: 'hsl(var(--primary))' }}
+        />
       </svg>
 
-      {/* Typography Branding exactly matching business card */}
+      {/* ── TYPOGRAPHY ────────────────────────────────── */}
       {variant === 'full' && (
-        <div className="flex flex-col justify-center leading-none">
-          <div className="font-mono-display font-black tracking-tight text-foreground uppercase italic select-none" style={{ fontSize: size === 'sm' ? '1rem' : size === 'md' ? '1.25rem' : size === 'lg' ? '1.65rem' : '2.5rem' }}>
-            <span>TURBO</span>
-            <span className="text-primary" style={{ color: 'hsl(var(--primary))' }}>TECH</span>
+        <div className="flex flex-col justify-center leading-none select-none">
+
+          {/* TURBOTECH */}
+          <div
+            className="font-black italic uppercase tracking-tight"
+            style={{ fontSize: s.brand }}
+          >
+            <span className="text-foreground">TURBO</span>
+            <span style={{ color: 'hsl(var(--primary))' }}>TECH</span>
           </div>
-          <div 
-            className="font-mono-display font-medium text-muted-foreground uppercase select-none" 
-            style={{ 
-              fontSize: size === 'sm' ? '0.5rem' : size === 'md' ? '0.625rem' : size === 'lg' ? '0.8rem' : '1.2rem',
-              letterSpacing: '0.36em',
-              marginTop: '2px'
+
+          {/* INDUSTRIES */}
+          <div
+            className="font-semibold uppercase text-muted-foreground"
+            style={{
+              fontSize: s.sub,
+              letterSpacing: '0.30em',
+              marginTop: '3px',
             }}
           >
             INDUSTRIES

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "drizzle-kit push",
-    "db:seed": "npx tsx src/scripts/seed.ts"
+    "db:seed": "npx tsx src/scripts/seed.ts",
+    "db:extend": "npx tsx src/scripts/seed_extend.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
