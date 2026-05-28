@@ -36,21 +36,20 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
   };
 
 
-  const handleExportCSV = () => {
-    let csv = 'Type,Name,Status,TotalCycles,ToolLife,OK,Defects,Operator\n';
-    machines.forEach(m => {
-      const mJobs = jobs.filter(j => j.machineId === m.id);
-      const ok = mJobs.reduce((s, j) => s + j.okParts, 0);
-      const rej = mJobs.reduce((s, j) => s + j.castingRejection + j.machineRejection + j.blowHole + j.rework, 0);
-      const op = users.find(u => u.id === m.currentOperatorId)?.name || 'None';
-      csv += `Node,${m.name},${m.status},${m.totalCycles},${m.toolLifePercent}%,${ok},${rej},${op}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `fleet_analytics_${new Date().getTime()}.csv`;
-    a.click();
+  const handleExportExcel = async () => {
+    try {
+      const res = await fetch('/api/export');
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `TurboTech_Production_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Failed to export. Please try again.');
+    }
   };
 
   const handleFileUpload = async (e: any) => {
@@ -188,8 +187,8 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
               <button onClick={() => setShowNodeModal(true)} className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 outline-none">
                 <Upload size={14} /> Import Nodes
               </button>
-              <button onClick={handleExportCSV} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:brightness-110 outline-none glow-primary">
-                <Download size={14} /> Export Metrics
+              <button onClick={handleExportExcel} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:brightness-110 outline-none glow-primary">
+                <Download size={14} /> Export Excel
               </button>
             </div>
           </div>
