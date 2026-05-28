@@ -33,7 +33,8 @@ export default function LoginPage() {
         throw new Error(data.error || 'Authentication sequence failed.');
       }
       
-      router.push(data.role === 'OWNER' ? '/dashboard' : '/employee');
+      const role = data.user?.role || data.role;
+      router.push(role === 'OWNER' || role === 'ADMIN' ? '/dashboard' : '/employee');
     } catch (e: any) {
       setError(e.message);
       setLoading(false);
