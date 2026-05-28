@@ -170,6 +170,12 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
               <Link href="/dashboard/calendar" className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 transition-colors outline-none">
                 <Calendar size={14} /> Calendar View
               </Link>
+              <Link href="/dashboard/jobs" className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 transition-colors outline-none">
+                <Package size={14} /> Job History
+              </Link>
+              <Link href="/dashboard/downtime" className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 transition-colors outline-none">
+                <AlertTriangle size={14} /> Downtime
+              </Link>
               <button onClick={() => setShowAttModal(true)} className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground text-xs font-bold uppercase tracking-wider rounded-md hover:bg-secondary/80 outline-none">
                 <Clock size={14} /> Log
               </button>
