@@ -70,36 +70,36 @@ export default function EmployeePortal() {
   return (
     <div className="flex justify-center min-h-screen bg-background text-foreground font-body">
       
-      <div className="w-full max-w-7xl flex flex-col h-screen">
+      <div className="w-full max-w-7xl flex flex-col min-h-screen md:h-screen">
         {/* Header */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-border bg-card shadow-sm shrink-0">
-          <div className="flex items-center gap-3">
-            <TurbotechLogo variant="full" size="md" />
-            <div className="h-6 w-[1px] bg-border mx-2 hidden sm:block"></div>
-            <p className="text-xs font-semibold text-primary uppercase tracking-widest hidden sm:block pt-1.5" style={{ color: 'hsl(var(--primary))' }}>Operator Terminal</p>
+        <header className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-border bg-card shadow-sm shrink-0">
+          <div className="flex items-center gap-2">
+            <TurbotechLogo variant="full" size="sm" />
+            <div className="h-5 w-[1px] bg-border mx-1 hidden sm:block"></div>
+            <p className="text-[10px] font-semibold text-primary uppercase tracking-widest hidden sm:block pt-1" style={{ color: 'hsl(var(--primary))' }}>Operator Terminal</p>
           </div>
-          <div className="flex items-center gap-3 md:gap-6 text-sm">
-            <div className="font-medium text-muted-foreground mr-1 md:mr-4 hidden sm:block">
-              Session Active: <span className="font-bold text-foreground ml-1">{userSession?.name}</span>
+          <div className="flex items-center gap-2 md:gap-4 text-sm">
+            <div className="font-medium text-muted-foreground hidden md:block text-xs">
+              <span className="font-bold text-foreground">{userSession?.name}</span>
             </div>
             
-            <button onClick={handlePasswordChange} className="flex items-center gap-2 px-4 py-2 rounded-md bg-secondary/50 text-secondary-foreground hover:bg-secondary transition-colors text-xs font-bold uppercase tracking-wider">
-              <Settings size={14} /> Change Passkey
+            <button onClick={handlePasswordChange} className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-secondary/50 text-secondary-foreground hover:bg-secondary transition-colors text-[10px] font-bold uppercase tracking-wider">
+              <Settings size={12} /> Passkey
             </button>
 
             <form action={logout}>
-              <button type="submit" className="flex items-center gap-2 px-4 py-2 rounded-md bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive hover:text-destructive-foreground transition-colors text-xs font-bold uppercase tracking-wider">
-                <LogOut size={14} /> System Exit
+              <button type="submit" className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive hover:text-destructive-foreground transition-colors text-[10px] font-bold uppercase tracking-wider">
+                <LogOut size={12} /> Exit
               </button>
             </form>
           </div>
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 flex gap-6 p-6 min-h-0 overflow-hidden">
+        <main className="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6 min-h-0 overflow-y-auto md:overflow-hidden">
           
           {/* Left Panel: Hardware Link */}
-          <motion.div variants={container} initial="hidden" animate="show" className="w-[340px] flex flex-col gap-6 shrink-0 overflow-y-auto pr-2 custom-scrollbar">
+          <motion.div variants={container} initial="hidden" animate="show" className="w-full md:w-[340px] flex flex-col gap-4 md:gap-6 shrink-0 md:overflow-y-auto md:pr-2 custom-scrollbar">
             
             <motion.div variants={item} className="card-industrial">
               <h3 className="text-sm font-semibold font-mono-display mb-4 uppercase tracking-widest text-muted-foreground">Hardware Interface</h3>
@@ -210,13 +210,14 @@ export default function EmployeePortal() {
           {/* Right Panel: Telemetry Form */}
           <div className="flex-1 flex flex-col min-w-0">
             {(!isOperatorAssigned || selectedMachine?.status !== 'ON') ? (
-              <div className="flex-1 card-industrial flex flex-col items-center justify-center text-center p-8 bg-card/50">
-                <div className="w-24 h-24 rounded-full bg-secondary/30 border border-border flex items-center justify-center mb-6">
-                  <Monitor size={40} className="text-muted-foreground opacity-50" />
+              <div className="flex-1 card-industrial flex flex-col items-center justify-center text-center p-6 md:p-8 bg-card/50 min-h-[200px]">
+                <div className="w-16 h-16 md:w-24 md:h-24 rounded-full bg-secondary/30 border border-border flex items-center justify-center mb-4 md:mb-6">
+                  <Monitor size={28} className="text-muted-foreground opacity-50 md:hidden" />
+                  <Monitor size={40} className="text-muted-foreground opacity-50 hidden md:block" />
                 </div>
-                <h3 className="text-xl font-bold font-mono-display text-muted-foreground mb-2 uppercase tracking-widest">Awaiting Link</h3>
-                <p className="text-sm text-muted-foreground max-w-sm">
-                  Initialize a secure hardware link from the terminal controls in the left panel to begin operational telemetry recording.
+                <h3 className="text-base md:text-xl font-bold font-mono-display text-muted-foreground mb-2 uppercase tracking-widest">Awaiting Link</h3>
+                <p className="text-xs md:text-sm text-muted-foreground max-w-sm">
+                  Select a machine above and tap INITIATE LINK to begin.
                 </p>
               </div>
             ) : (
@@ -238,35 +239,35 @@ export default function EmployeePortal() {
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
                         
                         {/* Giant OK Yield Field */}
-                        <div className="col-span-1 sm:col-span-3 rounded-xl flex flex-col items-center p-8 bg-emerald-500/5 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
-                          <label className="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2 text-emerald-500">
-                            <CheckCircle size={18} /> Verified Net Yield (OK)
+                        <div className="col-span-1 sm:col-span-3 rounded-xl flex flex-col items-center p-4 md:p-8 bg-emerald-500/5 border border-emerald-500/20 transition-all hover:border-emerald-500/40">
+                          <label className="text-[10px] md:text-xs font-bold uppercase tracking-widest mb-2 md:mb-4 flex items-center gap-2 text-emerald-500">
+                            <CheckCircle size={16} /> Verified Net Yield (OK)
                           </label>
                           <input 
                             type="number" 
                             min="0" 
                             value={jobData.okParts || ''} 
                             onChange={e=>setJobData({...jobData, okParts: parseInt(e.target.value) || 0})} 
-                            className="bg-transparent border-none outline-none text-center text-emerald-500 font-mono-display font-bold w-full p-2 placeholder:text-emerald-500/30"
-                            style={{ fontSize: '5rem', height: '6rem', MozAppearance: 'textfield' }}
+                            className="bg-transparent border-none outline-none text-center text-emerald-500 font-mono-display font-bold w-full p-2 placeholder:text-emerald-500/30 text-5xl md:text-7xl"
+                            style={{ MozAppearance: 'textfield' }}
                             placeholder="0" 
                           />
                         </div>
 
                         {/* Defect Quadrants */}
-                        <div className="rounded-xl flex flex-col items-center p-4 bg-rose-500/5 border border-rose-500/20 transition-all hover:border-rose-500/40">
-                          <label className="text-[10px] uppercase font-bold tracking-widest mb-2 text-rose-500 text-center">Cast Fracture</label>
-                          <input type="number" min="0" value={jobData.castingRejection || ''} onChange={e=>setJobData({...jobData, castingRejection: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-rose-500 font-mono-display font-bold text-4xl w-full placeholder:text-rose-500/30" placeholder="0" />
+                        <div className="rounded-xl flex flex-col items-center p-3 md:p-4 bg-rose-500/5 border border-rose-500/20 transition-all hover:border-rose-500/40">
+                          <label className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest mb-2 text-rose-500 text-center">Cast Fracture</label>
+                          <input type="number" min="0" value={jobData.castingRejection || ''} onChange={e=>setJobData({...jobData, castingRejection: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-rose-500 font-mono-display font-bold text-3xl md:text-4xl w-full placeholder:text-rose-500/30" placeholder="0" />
                         </div>
                         
-                        <div className="rounded-xl flex flex-col items-center p-4 bg-rose-500/5 border border-rose-500/20 transition-all hover:border-rose-500/40">
-                          <label className="text-[10px] uppercase font-bold tracking-widest mb-2 text-rose-500 text-center">Machining Err</label>
-                          <input type="number" min="0" value={jobData.machineRejection || ''} onChange={e=>setJobData({...jobData, machineRejection: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-rose-500 font-mono-display font-bold text-4xl w-full placeholder:text-rose-500/30" placeholder="0" />
+                        <div className="rounded-xl flex flex-col items-center p-3 md:p-4 bg-rose-500/5 border border-rose-500/20 transition-all hover:border-rose-500/40">
+                          <label className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest mb-2 text-rose-500 text-center">Machining Err</label>
+                          <input type="number" min="0" value={jobData.machineRejection || ''} onChange={e=>setJobData({...jobData, machineRejection: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-rose-500 font-mono-display font-bold text-3xl md:text-4xl w-full placeholder:text-rose-500/30" placeholder="0" />
                         </div>
                         
-                        <div className="rounded-xl flex flex-col items-center p-4 bg-amber-500/5 border border-amber-500/20 transition-all hover:border-amber-500/40">
-                          <label className="text-[10px] uppercase font-bold tracking-widest mb-2 text-amber-500 text-center">Scrap/Rework</label>
-                          <input type="number" min="0" value={jobData.rework || ''} onChange={e=>setJobData({...jobData, rework: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-amber-500 font-mono-display font-bold text-4xl w-full placeholder:text-amber-500/30" placeholder="0" />
+                        <div className="rounded-xl flex flex-col items-center p-3 md:p-4 bg-amber-500/5 border border-amber-500/20 transition-all hover:border-amber-500/40">
+                          <label className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest mb-2 text-amber-500 text-center">Scrap/Rework</label>
+                          <input type="number" min="0" value={jobData.rework || ''} onChange={e=>setJobData({...jobData, rework: parseInt(e.target.value) || 0})} className="bg-transparent border-none outline-none text-center text-amber-500 font-mono-display font-bold text-3xl md:text-4xl w-full placeholder:text-amber-500/30" placeholder="0" />
                         </div>
 
                       </div>
