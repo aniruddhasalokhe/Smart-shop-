@@ -8,6 +8,7 @@ interface JobRow {
   okParts: number;
   castingRejection: number;
   machineRejection: number;
+  blowHole?: number;
   rework: number;
 }
 
@@ -79,8 +80,20 @@ const CYCLE_TIMES: Record<string, number> = {
   'Bracket 020': 8, 'Bracket 099': 8.5,
 };
 
+function getISTDateInfo(date: Date) {
+  // IST is UTC + 5:30.
+  const istTime = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+  const year = istTime.getUTCFullYear();
+  const month = istTime.getUTCMonth();
+  const dateNum = istTime.getUTCDate();
+  const hour = istTime.getUTCHours();
+  const day = istTime.getUTCDay();
+  const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dateNum).padStart(2, '0')}`;
+  return { year, month, date: dateNum, hour, day, dateStr };
+}
+
 function getShift(date: Date): 'I' | 'II' | 'III' {
-  const hour = date.getHours();
+  const { hour } = getISTDateInfo(date);
   if (hour >= 8 && hour < 16) return 'I';
   if (hour >= 16 && hour < 24) return 'II';
   return 'III';
@@ -100,8 +113,7 @@ export async function generateProductionExcel(
   // Build downtime lookup: dateStr -> machineName -> { breakdown, powerCut, setup }
   const downtimeMap = new Map<string, Map<string, { breakdown: number; powerCut: number; setup: number }>>();
   for (const dt of downtimes) {
-    const d = new Date(dt.startTime);
-    const dateStr = d.toISOString().split('T')[0];
+    const { dateStr } = getISTDateInfo(new Date(dt.startTime));
     if (!downtimeMap.has(dateStr)) downtimeMap.set(dateStr, new Map());
     const machineMap = downtimeMap.get(dateStr)!;
     if (!machineMap.has(dt.machineName)) machineMap.set(dt.machineName, { breakdown: 0, powerCut: 0, setup: 0 });
@@ -115,8 +127,8 @@ export async function generateProductionExcel(
   // Group jobs by month
   const byMonth = new Map<string, JobRow[]>();
   for (const job of jobs) {
-    const d = new Date(job.createdAt);
-    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+    const { year, month } = getISTDateInfo(new Date(job.createdAt));
+    const key = `${year}-${String(month).padStart(2, '0')}`;
     if (!byMonth.has(key)) byMonth.set(key, []);
     byMonth.get(key)!.push(job);
   }
@@ -210,7 +222,7 @@ export async function generateProductionExcel(
     const grouped = new Map<string, Map<string, Map<string, JobRow[]>>>();
     for (const job of monthJobs) {
       const d = new Date(job.createdAt);
-      const dateStr = d.toISOString().split('T')[0];
+      const { dateStr } = getISTDateInfo(d);
       const shift = getShift(d);
       const machine = job.machineName;
       if (!grouped.has(dateStr)) grouped.set(dateStr, new Map());
@@ -225,8 +237,7 @@ export async function generateProductionExcel(
     const allDatesInMonth: string[] = [];
     const daysInMonth = lastDay.getDate();
     for (let d = 1; d <= daysInMonth; d++) {
-      const dt = new Date(year, month, d);
-      const ds = dt.toISOString().split('T')[0];
+      const ds = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       if (grouped.has(ds)) allDatesInMonth.push(ds);
     }
 
@@ -234,8 +245,8 @@ export async function generateProductionExcel(
 
     for (const dateStr of allDatesInMonth) {
       const byMachine = grouped.get(dateStr)!;
-      const date = new Date(dateStr + 'T00:00:00');
-      const dayName = DAYS[date.getDay()];
+      const date = new Date(dateStr + 'T00:00:00Z');
+      const dayName = DAYS[date.getUTCDay()];
       const dtForDate = downtimeMap.get(dateStr);
 
       const SHIFTS: ('I' | 'II' | 'III')[] = ['I', 'II', 'III'];
@@ -330,7 +341,7 @@ export async function generateProductionExcel(
 
           // Aggregate production
           const ok = shiftJobs.reduce((s, j) => s + (j.okParts || 0), 0);
-          const cr = shiftJobs.reduce((s, j) => s + (j.castingRejection || 0), 0);
+          const cr = shiftJobs.reduce((s, j) => s + (j.castingRejection || 0) + (j.blowHole || 0), 0);
           const mr = shiftJobs.reduce((s, j) => s + (j.machineRejection || 0), 0);
           const rw = shiftJobs.reduce((s, j) => s + (j.rework || 0), 0);
           const total = ok + cr + mr + rw;

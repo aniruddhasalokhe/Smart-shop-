@@ -51,6 +51,7 @@ export async function GET(request: Request) {
         okParts: jobs.okParts,
         castingRejection: jobs.castingRejection,
         machineRejection: jobs.machineRejection,
+        blowHole: jobs.blowHole,
         rework: jobs.rework,
       })
       .from(jobs)

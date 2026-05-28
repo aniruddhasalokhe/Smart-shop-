@@ -143,6 +143,7 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
     let ok = 0;
     let casting = 0;
     let machining = 0;
+    let blowHole = 0;
     let rework = 0;
     let quantity = 0;
 
@@ -150,15 +151,16 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
       ok += j.okParts;
       casting += j.castingRejection;
       machining += j.machineRejection;
+      blowHole += j.blowHole || 0;
       rework += j.rework;
       quantity += j.quantity;
     });
 
-    const defects = casting + machining;
+    const defects = casting + machining + blowHole;
     const totalProcessed = ok + defects + rework;
     const oee = totalProcessed > 0 ? ((ok / totalProcessed) * 100).toFixed(1) : '0.0';
 
-    return { ok, defects, casting, machining, rework, totalProcessed, quantity, oee };
+    return { ok, defects, casting, machining, blowHole, rework, totalProcessed, quantity, oee };
   }, [activePeriodJobs]);
 
   // Grouped Job metrics by Day for visual Calendar Grid overlay
@@ -172,8 +174,8 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
         map[dateStr] = { ok: 0, rejections: 0, total: 0 };
       }
       map[dateStr].ok += job.okParts;
-      map[dateStr].rejections += job.castingRejection + job.machineRejection + job.rework;
-      map[dateStr].total += job.okParts + job.castingRejection + job.machineRejection + job.rework;
+      map[dateStr].rejections += job.castingRejection + job.machineRejection + (job.blowHole || 0) + job.rework;
+      map[dateStr].total += job.okParts + job.castingRejection + job.machineRejection + (job.blowHole || 0) + job.rework;
     });
     return map;
   }, [filteredJobs]);
@@ -535,7 +537,7 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
                 // Aggregate monthly activity to show in cards
                 const monthJobs = filteredJobs.filter(j => j.localYear === selectedDate.getFullYear() && j.localMonth === idx);
                 const monthOk = monthJobs.reduce((s,j)=>s+j.okParts, 0);
-                const monthTotal = monthJobs.reduce((s,j)=>s+j.okParts+j.castingRejection+j.machineRejection+j.rework, 0);
+                const monthTotal = monthJobs.reduce((s,j)=>s+j.okParts+j.castingRejection+j.machineRejection+(j.blowHole || 0)+j.rework, 0);
                 
                 return (
                   <button
@@ -556,7 +558,7 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
                       <span>Log Roster:</span>
                       <span className={monthJobs.length > 0 ? 'text-primary' : ''}>{monthJobs.length} batches</span>
                     </div>
-                    {monthJobs.length > 0 && (
+                    {monthJobs.length > 0 && monthTotal > 0 && (
                       <div className="h-1 bg-secondary rounded-full overflow-hidden mt-1">
                         <div 
                           className="h-full bg-status-running" 
@@ -678,7 +680,7 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
                       const timeStr = new Date(job.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                       const dateStr = new Date(job.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                       
-                      const total = job.okParts + job.castingRejection + job.machineRejection + job.rework;
+                      const total = job.okParts + job.castingRejection + job.machineRejection + (job.blowHole || 0) + job.rework;
                       const rate = total > 0 ? ((job.okParts / total) * 100) : 0;
 
                       return (
@@ -723,7 +725,7 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
                             <div className="flex items-center justify-end gap-1.5">
                               <span className="text-emerald-500 font-bold" title="OK Net Yield">{job.okParts}</span>
                               <span className="text-muted-foreground">/</span>
-                              <span className="text-rose-500 font-semibold" title="Defects (Casting & Machining)">{job.castingRejection + job.machineRejection}</span>
+                              <span className="text-rose-500 font-semibold" title="Defects (Casting, Machining & Blow Hole)">{job.castingRejection + job.machineRejection + (job.blowHole || 0)}</span>
                               <span className="text-muted-foreground">/</span>
                               <span className="text-amber-500" title="Scrap Rework">{job.rework}</span>
                             </div>
