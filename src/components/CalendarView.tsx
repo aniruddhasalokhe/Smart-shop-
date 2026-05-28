@@ -181,68 +181,22 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
   // ---------------------------------------------------------------------------
   // Excel/CSV Exporter
   // ---------------------------------------------------------------------------
-  const handleExportCSV = () => {
-    let filename = `shop_report_`;
-    let periodHeader = '';
-
-    if (viewMode === 'day') {
-      const dateStr = getLocalDateString(selectedDate);
-      filename += `day_${dateStr}`;
-      periodHeader = `Day: ${selectedDate.toLocaleDateString()}`;
-    } else if (viewMode === 'week') {
-      const { start, end } = getWeekRange(selectedDate);
-      const startStr = getLocalDateString(start);
-      const endStr = getLocalDateString(end);
-      filename += `week_${startStr}_to_${endStr}`;
-      periodHeader = `Week: ${startStr} to ${endStr}`;
-    } else if (viewMode === 'month') {
-      const year = selectedDate.getFullYear();
-      const monthStr = getMonthName(selectedDate.getMonth());
-      filename += `month_${monthStr}_${year}`;
-      periodHeader = `Month: ${monthStr} ${year}`;
-    } else {
-      const year = selectedDate.getFullYear();
-      filename += `year_${year}`;
-      periodHeader = `Year: ${year}`;
+  const handleExportCSV = async () => {
+    try {
+      const res = await fetch('/api/export');
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `TurboTech_Production_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Failed to export. Please try again.');
     }
-
-    const activeOpName = selectedOperator === 'ALL' ? 'All Personnel' : (users.find(u=>u.id === selectedOperator)?.name || selectedOperator);
-    const activeMachName = selectedMachine === 'ALL' ? 'All Target Nodes' : (machines.find(m=>m.id === selectedMachine)?.name || selectedMachine);
-
-    let csvContent = `SMART SHOP-FLOOR OPERATIONAL ACTIVITY LEDGER\n`;
-    csvContent += `==============================================\n`;
-    csvContent += `Scope Period,${periodHeader}\n`;
-    csvContent += `View Setting,${viewMode.toUpperCase()} WISE\n`;
-    csvContent += `Filter Operator,${activeOpName}\n`;
-    csvContent += `Filter Machine/Node,${activeMachName}\n`;
-    if (searchQuery.trim()) csvContent += `Keyword Search,"${searchQuery}"\n`;
-    csvContent += `Export Timestamp,${new Date().toLocaleString()}\n\n`;
-
-    // Headers
-    csvContent += `Timestamp,Operator ID,Operator Name,Machine Node,Component Name,Origin Client,Quota Vol,Yield OK,Cast Rej,Machine Rej,Scrap Rework,Processed,Approved %\n`;
-
-    activePeriodJobs.forEach(job => {
-      const op = users.find(u => u.id === job.operatorId);
-      const mach = machines.find(m => m.id === job.machineId);
-      const timeStr = new Date(job.createdAt).toLocaleTimeString();
-      const dateStr = job.localDateString;
-      const total = job.okParts + job.castingRejection + job.machineRejection + job.rework;
-      const rate = total > 0 ? ((job.okParts / total) * 100).toFixed(1) : '0.0';
-      
-      csvContent += `"${dateStr} ${timeStr}","${job.operatorId}","${op?.name || 'Unknown'}","${mach?.name || 'Unknown'}","${job.componentName}","${job.companyName}",${job.quantity},${job.okParts},${job.castingRejection},${job.machineRejection},${job.rework},${total},${rate}%\n`;
-    });
-
-    // Summary total at bottom
-    csvContent += `\nSUMMARY TOTALS,,,,,,,${metrics.ok},${metrics.casting},${metrics.machining},${metrics.rework},${metrics.totalProcessed},${metrics.oee}%\n`;
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `${filename}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   // ---------------------------------------------------------------------------
@@ -376,10 +330,9 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
         {/* Action Button */}
         <button 
           onClick={handleExportCSV}
-          disabled={activePeriodJobs.length === 0}
-          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm outline-none"
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded-md hover:bg-emerald-500 transition-all shadow-sm outline-none"
         >
-          <FileSpreadsheet size={14} /> Export excel
+          <FileSpreadsheet size={14} /> Export Excel
         </button>
       </header>
 
