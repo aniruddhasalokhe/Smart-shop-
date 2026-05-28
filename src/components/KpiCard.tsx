@@ -27,7 +27,7 @@ export function KpiCard({ title, value, subtitle, icon: Icon, trend, trendValue,
           <p className="text-3xl font-bold font-mono-display tracking-tight">{value}</p>
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
           {trend && trendValue && (
-            <p className={cn("text-xs font-medium", trend === 'up' ? 'status-running' : trend === 'down' ? 'status-down' : 'text-muted-foreground')}>
+            <p className={cn("text-xs font-medium", trend === 'up' ? 'text-status-running' : trend === 'down' ? 'text-status-down' : 'text-muted-foreground')}>
               {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'} {trendValue}
             </p>
           )}

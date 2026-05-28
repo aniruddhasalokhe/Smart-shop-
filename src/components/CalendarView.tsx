@@ -536,7 +536,7 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
                       {/* Small Indicator */}
                       {hasActivity && (
                         <div className="flex items-center justify-between w-full">
-                          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: `var(--${dotColor === 'bg-status-running' ? 'status-running' : dotColor === 'bg-status-idle' ? 'status-idle' : 'status-down'})` }}></span>
+                          <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${dotColor}`}></span>
                           <span className="text-[8px] font-mono-display text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
                             +{dayJobs.ok}
                           </span>

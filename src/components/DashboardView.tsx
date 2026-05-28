@@ -191,7 +191,7 @@ export default function DashboardView({ machines, jobs, users, attendances }: { 
           {/* KPI Row 1: Hardware State */}
           <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <KpiCard title="Total Nodes" value={machines.length} icon={Monitor} accentColor="primary" />
-            <KpiCard title="Active Streams" value={running} icon={Zap} accentColor="running" trend="up" trendValue={`${((running/machines.length)*100).toFixed(0)}% Utilized`} />
+            <KpiCard title="Active Streams" value={running} icon={Zap} accentColor="running" trend="up" trendValue={`${machines.length > 0 ? ((running/machines.length)*100).toFixed(0) : 0}% Utilized`} />
             <KpiCard title="Standby Offline" value={idle} icon={Clock} accentColor="idle" />
             <KpiCard title="Maintenance Halt" value={down} icon={AlertTriangle} accentColor="down" />
           </motion.div>

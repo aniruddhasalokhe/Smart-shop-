@@ -279,9 +279,9 @@ export default function EmployeePortal() {
                       disabled={isSubmitting}
                       onClick={async () => {
                         const fallbackPlan = {
-                          companyName: plan.companyName || 'Generic Client',
-                          componentName: plan.componentName || 'Test Component',
-                          quantity: plan.quantity || 100
+                          companyName: plan.companyName || 'Valmet India',
+                          componentName: plan.componentName || 'QTF 90 Body 1st',
+                          quantity: plan.quantity || 50
                         };
                         setIsSubmitting(true);
                         await logJob(selectedMachineId, { ...fallbackPlan, ...jobData });

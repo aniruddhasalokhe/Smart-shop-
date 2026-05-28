@@ -16,8 +16,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Allow auth logic API routes without checking token
-  if (path.startsWith('/api/auth')) {
+  // Allow specific auth API routes without checking token
+  if (path === '/api/auth/login' || path === '/api/auth/me') {
     return NextResponse.next();
   }
 
@@ -45,7 +45,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/employee', request.url));
     }
     
-    if (path.startsWith('/employee') && payload.role !== 'OPERATOR' && payload.role !== 'ADMIN') {
+    if (path.startsWith('/employee') && payload.role !== 'OPERATOR' && payload.role !== 'ADMIN' && payload.role !== 'OWNER') {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
