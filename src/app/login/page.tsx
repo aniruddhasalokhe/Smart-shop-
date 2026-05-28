@@ -133,12 +133,7 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-8 text-center border-t border-border pt-6">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-2 font-mono-display">Verified Fleet Credentials</p>
-              <div className="flex justify-center gap-4 text-xs font-mono-display text-muted-foreground">
-                <span className="hover:text-primary transition-colors cursor-crosshair">boss : password123</span>
-                <span>//</span>
-                <span className="hover:text-primary transition-colors cursor-crosshair">m.chen : password123</span>
-              </div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono-display">Authorized Personnel Only</p>
             </div>
 
           </div>
