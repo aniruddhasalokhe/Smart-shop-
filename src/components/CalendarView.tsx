@@ -183,13 +183,37 @@ export default function CalendarView({ machines, jobs, users }: CalendarViewProp
   // ---------------------------------------------------------------------------
   const handleExportCSV = async () => {
     try {
-      const res = await fetch('/api/export');
+      // Calculate date range based on current view mode
+      let fromDate: string;
+      let toDate: string;
+
+      if (viewMode === 'day') {
+        fromDate = getLocalDateString(selectedDate);
+        toDate = fromDate;
+      } else if (viewMode === 'week') {
+        const { start, end } = getWeekRange(selectedDate);
+        fromDate = getLocalDateString(start);
+        toDate = getLocalDateString(end);
+      } else if (viewMode === 'month') {
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth();
+        fromDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        toDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      } else {
+        // Year view
+        const year = selectedDate.getFullYear();
+        fromDate = `${year}-01-01`;
+        toDate = `${year}-12-31`;
+      }
+
+      const res = await fetch(`/api/export?from=${fromDate}&to=${toDate}`);
       if (!res.ok) throw new Error('Export failed');
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `TurboTech_Production_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+      link.download = `TurboTech_Report_${fromDate}_to_${toDate}.xlsx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { jobs, users, machines, downtimes } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, gte, lte, and } from 'drizzle-orm';
 import { generateProductionExcel } from '@/lib/exportExcel';
-import { getSession } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   // Auth check
   const cookieStore = await cookies();
   const token = cookieStore.get('shopfloor_token')?.value;
@@ -17,8 +16,33 @@ export async function GET() {
   }
 
   try {
-    // Fetch jobs with machine and operator names via join
-    const rawJobs = await db
+    const { searchParams } = new URL(request.url);
+    const fromParam = searchParams.get('from');
+    const toParam = searchParams.get('to');
+
+    // Build date filters if provided
+    const dateFilters: any[] = [];
+    if (fromParam) {
+      dateFilters.push(gte(jobs.createdAt, new Date(fromParam)));
+    }
+    if (toParam) {
+      const toDate = new Date(toParam);
+      toDate.setHours(23, 59, 59, 999);
+      dateFilters.push(lte(jobs.createdAt, toDate));
+    }
+
+    const dtDateFilters: any[] = [];
+    if (fromParam) {
+      dtDateFilters.push(gte(downtimes.startTime, new Date(fromParam)));
+    }
+    if (toParam) {
+      const toDate = new Date(toParam);
+      toDate.setHours(23, 59, 59, 999);
+      dtDateFilters.push(lte(downtimes.startTime, toDate));
+    }
+
+    // Fetch jobs with optional date range filter
+    let jobsQuery = db
       .select({
         createdAt: jobs.createdAt,
         machineName: machines.name,
@@ -34,8 +58,14 @@ export async function GET() {
       .innerJoin(users, eq(jobs.operatorId, users.id))
       .orderBy(jobs.createdAt);
 
-    // Fetch downtimes with machine names
-    const rawDowntimes = await db
+    if (dateFilters.length > 0) {
+      jobsQuery = jobsQuery.where(and(...dateFilters)) as any;
+    }
+
+    const rawJobs = await jobsQuery;
+
+    // Fetch downtimes with optional date range filter
+    let dtQuery = db
       .select({
         machineId: downtimes.machineId,
         machineName: machines.name,
@@ -47,14 +77,28 @@ export async function GET() {
       .innerJoin(machines, eq(downtimes.machineId, machines.id))
       .orderBy(downtimes.startTime);
 
+    if (dtDateFilters.length > 0) {
+      dtQuery = dtQuery.where(and(...dtDateFilters)) as any;
+    }
+
+    const rawDowntimes = await dtQuery;
+
     const buffer = await generateProductionExcel(rawJobs, rawDowntimes);
 
-    const today = new Date().toISOString().split('T')[0];
+    // Build filename based on date range
+    let filename = 'TurboTech_Production_Report';
+    if (fromParam && toParam) {
+      filename += `_${fromParam}_to_${toParam}`;
+    } else if (fromParam) {
+      filename += `_from_${fromParam}`;
+    } else {
+      filename += `_${new Date().toISOString().split('T')[0]}`;
+    }
     
     return new NextResponse(buffer, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="TurboTech_Production_Report_${today}.xlsx"`,
+        'Content-Disposition': `attachment; filename="${filename}.xlsx"`,
       },
     });
   } catch (error) {
