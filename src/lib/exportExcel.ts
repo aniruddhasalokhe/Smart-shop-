@@ -338,7 +338,7 @@ export async function generateProductionExcel(
           // Most common component & operator
           const compCounts = new Map<string, number>();
           shiftJobs.forEach(j => compCounts.set(j.componentName, (compCounts.get(j.componentName) || 0) + 1));
-          const component = [...compCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+          const component = Array.from(compCounts.entries()).sort((a, b) => b[1] - a[1])[0][0];
           const operator = shiftJobs[0].operatorName;
 
           const cycleTime = CYCLE_TIMES[component] ?? 10.5;
