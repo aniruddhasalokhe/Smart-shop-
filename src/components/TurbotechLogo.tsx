@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 
 interface TurbotechLogoProps {
   variant?: 'icon' | 'full';
@@ -11,30 +10,28 @@ interface TurbotechLogoProps {
 
 export default function TurbotechLogo({ variant = 'full', size = 'md', className = '' }: TurbotechLogoProps) {
   const sizeMap = {
-    sm: { height: 36,  width: 120 },
-    md: { height: 48,  width: 160 },
-    lg: { height: 64,  width: 210 },
-    xl: { height: 96,  width: 320 },
+    sm: { height: '32px',  width: '110px' },
+    md: { height: '44px',  width: '150px' },
+    lg: { height: '60px',  width: '200px' },
+    xl: { height: '90px',  width: '300px' },
   };
 
   const iconSizeMap = {
-    sm: { height: 36, width: 36 },
-    md: { height: 48, width: 48 },
-    lg: { height: 64, width: 64 },
-    xl: { height: 96, width: 96 },
+    sm: { height: '32px', width: '32px' },
+    md: { height: '44px', width: '44px' },
+    lg: { height: '60px', width: '60px' },
+    xl: { height: '90px', width: '90px' },
   };
 
   const s = variant === 'icon' ? iconSizeMap[size] : sizeMap[size];
 
   return (
     <div className={`flex items-center shrink-0 select-none ${className}`}>
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src="/logo.svg"
         alt="TurboTech Industries"
-        width={s.width}
-        height={s.height}
-        className="object-contain"
-        priority
+        style={{ height: s.height, width: s.width, objectFit: 'contain' }}
       />
     </div>
   );
