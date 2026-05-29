@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Play, Square, AlertTriangle, Settings, LogOut, CheckCircle, Upload, Activity, Monitor } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Play, Square, AlertTriangle, Settings, LogOut, CheckCircle, Upload, Activity, Monitor, Clock } from 'lucide-react';
 import { getMachines, updateMachineStatus, resolveDowntime, logJob, logout, getCurrentUser, changeMyPassword } from '@/actions';
 import { StatusBadge } from '@/components/StatusBadge';
 import { motion } from 'framer-motion';
@@ -18,6 +18,24 @@ export default function EmployeePortal() {
   const [userSession, setUserSession] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Live clock — ticks every second
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Determine current shift from time
+  const getShiftInfo = useCallback((date: Date) => {
+    const hour = date.getHours();
+    if (hour >= 8 && hour < 16) return { number: 1, label: 'Shift I', window: '08:00 AM – 04:00 PM', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', glow: 'shadow-emerald-500/20' };
+    if (hour >= 16 && hour < 24) return { number: 2, label: 'Shift II', window: '04:00 PM – 12:00 AM', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30', glow: 'shadow-amber-500/20' };
+    return { number: 3, label: 'Shift III', window: '12:00 AM – 08:00 AM', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', glow: 'shadow-blue-500/20' };
+  }, []);
+
+  const shiftInfo = getShiftInfo(currentTime);
+  const timeString = currentTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
   const loadData = async () => {
     const data = await getMachines();
@@ -79,6 +97,12 @@ export default function EmployeePortal() {
             <p className="text-[10px] font-semibold text-primary uppercase tracking-widest hidden sm:block pt-1" style={{ color: 'hsl(var(--primary))' }}>Operator Terminal</p>
           </div>
           <div className="flex items-center gap-2 md:gap-4 text-sm">
+            {/* Shift Badge in Header */}
+            <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md ${shiftInfo.bg} ${shiftInfo.border} border`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${shiftInfo.color.replace('text-', 'bg-')}`}></span>
+              <span className={`text-[10px] font-bold uppercase tracking-widest ${shiftInfo.color}`}>{shiftInfo.label}</span>
+              <span className="text-[9px] text-muted-foreground font-mono-display">{timeString}</span>
+            </div>
             <div className="font-medium text-muted-foreground hidden md:block text-xs">
               <span className="font-bold text-foreground">{userSession?.name}</span>
             </div>
@@ -101,6 +125,29 @@ export default function EmployeePortal() {
           {/* Left Panel: Hardware Link */}
           <motion.div variants={container} initial="hidden" animate="show" className="w-full md:w-[340px] flex flex-col gap-4 md:gap-6 shrink-0 md:overflow-y-auto md:pr-2 custom-scrollbar">
             
+            {/* Shift Info Card */}
+            <motion.div variants={item} className={`card-industrial ${shiftInfo.border} border overflow-hidden relative`}>
+              <div className={`absolute inset-0 ${shiftInfo.bg} opacity-30`}></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold font-mono-display uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <Clock size={14} className={shiftInfo.color} /> Active Shift
+                  </h3>
+                  <span className={`w-2 h-2 rounded-full animate-pulse ${shiftInfo.color.replace('text-', 'bg-')}`}></span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className={`text-2xl font-bold font-mono-display ${shiftInfo.color}`}>{shiftInfo.label}</span>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 font-mono-display">{shiftInfo.window}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-bold font-mono-display text-foreground">{timeString}</span>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{currentTime.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             <motion.div variants={item} className="card-industrial">
               <h3 className="text-sm font-semibold font-mono-display mb-4 uppercase tracking-widest text-muted-foreground">Hardware Interface</h3>
               
