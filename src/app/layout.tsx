@@ -4,8 +4,11 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Smart Shop Floor Monitoring',
-  description: 'Efficiency Tracking System',
+  title: 'Smart Shop Floor | TurboTech Industries',
+  description: 'Real-time manufacturing monitoring and operational telemetry',
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
