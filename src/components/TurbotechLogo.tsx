@@ -13,9 +13,7 @@ interface TurbotechLogoProps {
  * Renders a blue-gradient squircle with a bold white "T" letterform.
  * At larger sizes (≥48px), a green "live monitoring" indicator dot appears.
  */
-function LogoIcon({ size, gradientId }: { size: number; gradientId: string }) {
-  const showPulse = size >= 48;
-
+function LogoIcon({ size }: { size: number }) {
   return (
     <svg
       viewBox="0 0 512 512"
@@ -27,36 +25,17 @@ function LogoIcon({ size, gradientId }: { size: number; gradientId: string }) {
       aria-label="TurboTech logo"
       style={{ display: 'block', flexShrink: 0 }}
     >
-      <defs>
-        <linearGradient
-          id={gradientId}
-          x1="0"
-          y1="0"
-          x2="512"
-          y2="512"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#3B82F6" />
-          <stop offset="1" stopColor="#06B6D4" />
-        </linearGradient>
-      </defs>
-
-      {/* Squircle background */}
-      <rect width="512" height="512" rx="112" fill={`url(#${gradientId})`} />
-
-      {/* T — horizontal bar */}
-      <rect x="88" y="108" width="336" height="64" rx="14" fill="#fff" />
-
-      {/* T — vertical bar */}
-      <rect x="216" y="108" width="80" height="292" rx="14" fill="#fff" />
-
-      {/* Monitoring pulse indicator (only at large sizes) */}
-      {showPulse && (
-        <>
-          <circle cx="412" cy="412" r="40" fill="#10B981" />
-          <circle cx="412" cy="412" r="20" fill="#fff" />
-        </>
-      )}
+      {/* Gear (#4A4A4A) */}
+      <path
+        fill="#4A4A4A"
+        fillRule="evenodd"
+        d="M 226.1 109.0 L 233.5 47.2 L 278.5 47.2 L 285.9 109.0 A 150 150 0 0 1 303.6 113.8 L 340.9 63.9 L 379.9 86.4 L 355.4 143.7 A 150 150 0 0 1 368.3 156.6 L 425.6 132.1 L 448.1 171.1 L 398.2 208.4 A 150 150 0 0 1 403.0 226.1 L 464.8 233.5 L 464.8 278.5 L 403.0 285.9 A 150 150 0 0 1 398.2 303.6 L 448.1 340.9 L 425.6 379.9 L 368.3 355.4 A 150 150 0 0 1 355.4 368.3 L 379.9 425.6 L 340.9 448.1 L 303.6 398.2 A 150 150 0 0 1 285.9 403.0 L 278.5 464.8 L 233.5 464.8 L 226.1 403.0 A 150 150 0 0 1 208.4 398.2 L 171.1 448.1 L 132.1 425.6 L 156.6 368.3 A 150 150 0 0 1 143.7 355.4 L 86.4 379.9 L 63.9 340.9 L 113.8 303.6 A 150 150 0 0 1 109.0 285.9 L 47.2 278.5 L 47.2 233.5 L 109.0 226.1 A 150 150 0 0 1 113.8 208.4 L 63.9 171.1 L 86.4 132.1 L 143.7 156.6 A 150 150 0 0 1 156.6 143.7 L 132.1 86.4 L 171.1 63.9 L 208.4 113.8 A 150 150 0 0 1 226.1 109.0 Z M 256 216 A 40 40 0 1 0 256 296 A 40 40 0 1 0 256 216 Z"
+      />
+      {/* T Letter (#0EA5E9) */}
+      <g fill="#0EA5E9">
+        <rect x="186" y="238.5" width="140" height="35" rx="8" />
+        <rect x="233.5" y="273.5" width="45" height="180" rx="8" />
+      </g>
     </svg>
   );
 }
@@ -77,11 +56,6 @@ export default function TurbotechLogo({
   size = 'md',
   className = '',
 }: TurbotechLogoProps) {
-  // Generate a unique ID for the SVG gradient to avoid DOM conflicts
-  // when multiple logo instances are on the same page
-  const uniqueId = React.useId().replace(/:/g, '');
-  const gradientId = `turbo-grad-${uniqueId}`;
-
   const config = {
     sm: { icon: 28, title: '13px', subtitle: '8.5px', gap: '6px' },
     md: { icon: 36, title: '16px', subtitle: '10px', gap: '8px' },
@@ -94,7 +68,7 @@ export default function TurbotechLogo({
   if (variant === 'icon') {
     return (
       <div className={`flex items-center shrink-0 select-none ${className}`}>
-        <LogoIcon size={c.icon} gradientId={gradientId} />
+        <LogoIcon size={c.icon} />
       </div>
     );
   }
@@ -105,7 +79,7 @@ export default function TurbotechLogo({
       className={`flex items-center shrink-0 select-none ${className}`}
       style={{ gap: c.gap }}
     >
-      <LogoIcon size={c.icon} gradientId={gradientId} />
+      <LogoIcon size={c.icon} />
 
       <div
         style={{
@@ -126,7 +100,7 @@ export default function TurbotechLogo({
             whiteSpace: 'nowrap',
           }}
         >
-          Turbo<span style={{ color: '#3B82F6' }}>Tech</span>
+          Turbo<span style={{ color: '#0EA5E9' }}>Tech</span>
         </span>
 
         {/* Subtitle */}
